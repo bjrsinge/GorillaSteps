@@ -14,7 +14,6 @@ namespace GorillaSteps.Patches
         {
             if (__instance.isOfflineVRRig)
             {
-
                 stepsCount++;
                 Plugin.asset.GetComponentInChildren<Text>().text = $"{stepsCount}";
                 DataSystem.SaveData();
