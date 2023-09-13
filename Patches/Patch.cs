@@ -8,7 +8,6 @@ namespace GorillaSteps.Patches
     class HandTapPatch
     {
         public static int stepsCount;
-        public static int soundIndex;
 
         static void Postfix(VRRig __instance)
         {
