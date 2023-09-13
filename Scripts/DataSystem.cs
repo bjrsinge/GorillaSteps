@@ -16,10 +16,6 @@ namespace GorillaSteps.Scripts
 
             binaryFormatter.Serialize(fileStream, playerData);
             fileStream.Close();
-
-#if DEBUG
-            Debug.Log($"Saved Player Data To : {path}");
-#endif
         }
 
         public static PlayerData GetPlayerData()

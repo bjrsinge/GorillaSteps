@@ -15,7 +15,6 @@ namespace GorillaSteps
     [BepInPlugin("bjrsinge.gorillasteps", "GorillaSteps", "1.0.4")]
     public class Plugin : BaseUnityPlugin
     {
-        private bool ModInitialized;
         public static GameObject asset;
 
         public AssetBundle LoadAssetBundle(string path)
@@ -29,6 +28,7 @@ namespace GorillaSteps
         void Start()
         {
             Utilla.Events.GameInitialized += OnGameInitialized;
+            HarmonyPatches.ApplyHarmonyPatches();    
         }
 
         void OnGameInitialized(object sender, EventArgs e)
@@ -44,22 +44,13 @@ namespace GorillaSteps
             asset.AddComponent<MeshRenderer>();
             asset.GetComponent<MeshRenderer>().enabled = true;
             asset.transform.localScale = new Vector3(0.07f, 0.07f, 0.07f);
-            asset.transform.localPosition = new Vector3(-0.01f /* c'est bon je pense */, 0f, -0.15f);
-            asset.transform.localRotation = new Quaternion(GorillaLocomotion.Player.Instance.rightHandFollower.transform.rotation.x + 30f, GorillaLocomotion.Player.Instance.rightHandFollower.transform.rotation.y, GorillaLocomotion.Player.Instance.rightHandFollower.transform.rotation.z + 90f, 0);
+            asset.transform.localPosition = new Vector3(0.13f /* c'est bon je pense */, -0.02f, -0.05f);
+            asset.transform.localEulerAngles = new Vector3(GorillaLocomotion.Player.Instance.rightHandFollower.transform.rotation.x + 30f, 180f, 0f);
             asset.GetComponentInChildren<BoxCollider>().enabled = false;
 
             asset.GetComponentInChildren<Text>().font = GameObject.Find("Player Objects/Local VRRig/Local Gorilla Player/rig/NameTagAnchor/NameTagCanvas/Text").GetComponent<Text>().font;
-            asset.GetComponentInChildren<Text>().text = HandTapPatch.stepsCount.ToString();
-
-            ModInitialized = true;
-        }
-
-        void Update()
-        {
-            if (ModInitialized)
-            {
-                asset.GetComponentInChildren<Text>().text = $"{HandTapPatch.stepsCount}";
-            }
+            asset.GetComponentInChildren<Text>().text = playerData.steps.ToString();
+            asset.GetComponentInChildren<Text>().transform.localEulerAngles = new Vector3(0f, 90f, -90f);
         }
     }
 }

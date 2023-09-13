@@ -1,21 +1,22 @@
 ﻿using GorillaSteps.Scripts;
 using HarmonyLib;
-using System.Runtime.CompilerServices;
-using UnityEngine;
+using UnityEngine.UI;
 
 namespace GorillaSteps.Patches
 {
-    [HarmonyPatch(typeof(VRRig), "PlayHandTapLocal"), HarmonyWrapSafe]
+    [HarmonyPatch(typeof(VRRig), "PlayHandTapLocal")]
     class HandTapPatch
     {
         public static int stepsCount;
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        static void Prefix(VRRig __instance)
+        public static int soundIndex;
+
+        static void Postfix(VRRig __instance)
         {
             if (__instance.isOfflineVRRig)
             {
+
                 stepsCount++;
-                Debug.Log("patch ran");
+                Plugin.asset.GetComponentInChildren<Text>().text = $"{stepsCount}";
                 DataSystem.SaveData();
             }
         }
