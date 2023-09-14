@@ -44,7 +44,7 @@ namespace GorillaSteps
             asset.AddComponent<MeshRenderer>();
             asset.GetComponent<MeshRenderer>().enabled = true;
             asset.transform.localScale = new Vector3(0.07f, 0.07f, 0.07f);
-            asset.transform.localPosition = new Vector3(0.13f /* c'est bon je pense */, -0.02f, -0.05f);
+            asset.transform.localPosition = new Vector3(0.13f, -0.02f, -0.05f);
             asset.transform.localEulerAngles = new Vector3(GorillaLocomotion.Player.Instance.rightHandFollower.transform.rotation.x + 30f, 180f, 0f);
             asset.GetComponentInChildren<BoxCollider>().enabled = false;
 
