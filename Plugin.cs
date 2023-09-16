@@ -6,7 +6,6 @@ using System.IO;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
-using Utilla;
 
 namespace GorillaSteps
 {
@@ -16,6 +15,7 @@ namespace GorillaSteps
     public class Plugin : BaseUnityPlugin
     {
         public static GameObject asset;
+        public bool init;
 
         public AssetBundle LoadAssetBundle(string path)
         {
@@ -31,7 +31,9 @@ namespace GorillaSteps
             HarmonyPatches.ApplyHarmonyPatches();    
         }
 
-        void OnGameInitialized(object sender, EventArgs e)
+
+
+        void SetupBundle()
         {
             PlayerData playerData = DataSystem.GetPlayerData();
             HandTapPatch.stepsCount = playerData.steps;
@@ -51,6 +53,22 @@ namespace GorillaSteps
             asset.GetComponentInChildren<Text>().font = GameObject.Find("Player Objects/Local VRRig/Local Gorilla Player/rig/NameTagAnchor/NameTagCanvas/Text").GetComponent<Text>().font;
             asset.GetComponentInChildren<Text>().text = playerData.steps.ToString();
             asset.GetComponentInChildren<Text>().transform.localEulerAngles = new Vector3(0f, 90f, -90f);
+        }
+
+        public void OnDisable()
+        {
+            if (init) { asset.SetActive(false); }
+        }
+
+        public void OnEnable()
+        {
+            if (init) { asset.SetActive(true); }
+        }
+
+        void OnGameInitialized(object sender, EventArgs e)
+        {
+            SetupBundle();
+            init = true;
         }
     }
 }
