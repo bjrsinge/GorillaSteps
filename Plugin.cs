@@ -11,11 +11,12 @@ namespace GorillaSteps
 {
 
     [BepInDependency("dev.auros.bepinex.bepinject")]
-    [BepInPlugin("bjrsinge.gorillasteps", "GorillaSteps", "1.0.4")]
+    [BepInPlugin("bjrsinge.gorillasteps", "GorillaSteps", "1.0.7")]
     public class Plugin : BaseUnityPlugin
     {
         public static GameObject asset;
         public bool init;
+        public GameObject btn;
 
         public AssetBundle LoadAssetBundle(string path)
         {
@@ -28,19 +29,16 @@ namespace GorillaSteps
         void Start()
         {
             Utilla.Events.GameInitialized += OnGameInitialized;
-            HarmonyPatches.ApplyHarmonyPatches();    
+            HarmonyPatches.ApplyHarmonyPatches();
         }
-
-
 
         void SetupBundle()
         {
             PlayerData playerData = DataSystem.GetPlayerData();
             HandTapPatch.stepsCount = playerData.steps;
 
-            var bundle = LoadAssetBundle("GorillaSteps.Bundle.watchbundleagain");
+            var bundle = LoadAssetBundle("GorillaSteps.watchbundleagain");
             asset = Instantiate(bundle.LoadAsset<GameObject>("thewatch3"));
-            DontDestroyOnLoad(asset);
 
             asset.transform.SetParent(GorillaTagger.Instance.rightHandTransform, false);
             asset.AddComponent<MeshRenderer>();
@@ -50,7 +48,7 @@ namespace GorillaSteps
             asset.transform.localEulerAngles = new Vector3(GorillaLocomotion.Player.Instance.rightHandFollower.transform.rotation.x + 30f, 180f, 0f);
             asset.GetComponentInChildren<BoxCollider>().enabled = false;
 
-            asset.GetComponentInChildren<Text>().font = GameObject.Find("Player Objects/Local VRRig/Local Gorilla Player/rig/NameTagAnchor/NameTagCanvas/Text").GetComponent<Text>().font;
+            asset.GetComponentInChildren<Text>().font = GorillaTagger.Instance.offlineVRRig.playerText.font;
             asset.GetComponentInChildren<Text>().text = playerData.steps.ToString();
             asset.GetComponentInChildren<Text>().transform.localEulerAngles = new Vector3(0f, 90f, -90f);
         }
@@ -69,6 +67,18 @@ namespace GorillaSteps
         {
             SetupBundle();
             init = true;
+        }
+
+        public static void BtnFunc()
+        {
+            if (asset.GetComponentInChildren<Text>().text != HandTapPatch.stepsCount.ToString())
+            {
+                asset.GetComponentInChildren<Text>().text = "testing";
+            }
+            else if (asset.GetComponentInChildren<Text>().text != "testing")
+            {
+                asset.GetComponentInChildren<Text>().text = HandTapPatch.stepsCount.ToString();
+            }
         }
     }
 }
