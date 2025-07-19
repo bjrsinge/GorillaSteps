@@ -9,7 +9,7 @@ namespace GorillaSteps.Scripts
 
         internal PlayerData()
         {
-            steps = HandTapPatch.stepsCount;
+            steps = HandTapPatch.steps_count;
         }
     }
 }
