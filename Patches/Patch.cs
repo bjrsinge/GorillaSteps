@@ -14,7 +14,7 @@ namespace GorillaSteps.Patches
         public static int steps_count;
         static float lastTap = -1f;
 
-        static void Postfix(GorillaTagger __instance, bool isHandTouching, bool wasHandTouching, int handMatIndex, ref float lastTapTime, GorillaVelocityTracker handVelocityTracker)
+        static void Postfix(GorillaTagger __instance, bool isHandTouching, bool wasHandTouching, ref float lastTapTime, GorillaVelocityTracker handVelocityTracker)
         {
             int audioClipIndex = __instance.audioClipIndex;
             Vector3 avg_vel = handVelocityTracker.GetAverageVelocity(true, 0.03f, false);
