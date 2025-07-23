@@ -7,37 +7,24 @@ using System.Collections;
 using System.IO;
 using System.Reflection;
 using TMPro;
+using Unity.XR.Oculus.Input;
 using UnityEngine;
 
 namespace GorillaSteps
 {
 
-    [BepInDependency("dev.auros.bepinex.bepinject")]
-    [BepInPlugin("bjrsinge.gorillasteps", "GorillaSteps", "1.0.7")]
+    //[BepInDependency("dev.auros.bepinex.bepinject")]
+    [BepInPlugin("com.bjrsinge.gorillatag.gorillasteps", "GorillaSteps", "1.1.9")]
     public class Plugin : BaseUnityPlugin
     {
-        public GameObject asset;
-        public static GameObject steps_text;
-        public GameObject stats;
-        public GameObject screen;
-        public GameObject time_text;
-        public GameObject code_text;
-        public GameObject date_text;
-        public GameObject playtime_text;
+        public GameObject asset, stats, screen;
+        public static TextMeshPro steps_text;
+        public TextMeshPro time_text, code_text, date_text, playtime_text;
         public static bool init;
-        public bool load;
-        public bool can_load = true;
-        public bool left_btn;
-        public bool right_btn;
-        public string date;
-        public string time;
-        public string code;
-        public string playtime_string;
-        public int playtime = 0;
-        public int seconds = 0;
-        public int minutes = 0;
-        public int hours = 0;
-        public int days = 0;
+        public bool load, can_load = true, right_btn;
+        public string date, time, last_date, last_time, code, last_code, playtime_string;
+        public int playtime, seconds, minutes, hours, days;
+        public float timer;
 
         public AssetBundle LoadAssetBundle(string path)
         {
@@ -63,47 +50,39 @@ namespace GorillaSteps
 
             //objects
             screen = asset.transform.Find("Cube (1)").gameObject;
-            steps_text = screen.transform.Find("steps_text").gameObject;
+            steps_text = screen.transform.Find("steps_text").GetComponent<TextMeshPro>();
             stats = screen.transform.Find("stats").gameObject;
-            time_text = stats.transform.Find("time").gameObject;
-            code_text = stats.transform.Find("code").gameObject;
-            playtime_text = stats.transform.Find("playtime").gameObject;
-            date_text = stats.transform.Find("date").gameObject;
+            time_text = stats.transform.Find("time").GetComponent<TextMeshPro>();
+            code_text = stats.transform.Find("code").GetComponent<TextMeshPro>();
+            playtime_text = stats.transform.Find("playtime").GetComponent<TextMeshPro>();
+            date_text = stats.transform.Find("date").GetComponent<TextMeshPro>();
 
             //watch position
-            asset.transform.localScale = new Vector3(0.07f, 0.07f, 0.07f);
-            asset.transform.localPosition = new Vector3(0.13f, -0.02f, -0.05f);
-            asset.transform.localEulerAngles = new Vector3(GorillaLocomotion.GTPlayer.Instance.rightHandFollower.transform.rotation.x + 30f, 180f, 0f);
             asset.transform.SetParent(GorillaTagger.Instance.rightHandTransform, false);
-            //screen.GetComponentInChildren<Text>().transform.localEulerAngles = new Vector3(0f, 90f, -90f);
+            asset.transform.localScale = new Vector3(0.07f, 0.07f, 0.07f);
+            if (Info.Location.StartsWith("C:\\Program Files\\Oculus\\Software\\Software\\another-axiom-gorilla-tag")) 
+            {
+                asset.transform.localPosition = new Vector3(0.13f, -0.02f, -0.01f);
+                asset.transform.localEulerAngles = new Vector3(85f, 180f, 0f);
+            }
+            else
+            {
+                asset.transform.localPosition = new Vector3(0.13f, -0.02f, -0.05f);
+                asset.transform.localEulerAngles = new Vector3(30f, 180f, 0f);
+            }
 
             //set fonts
-            steps_text.GetComponent<TextMeshPro>().font = GorillaTagger.Instance.offlineVRRig.playerText1.font;
-            time_text.GetComponent<TextMeshPro>().font = GorillaTagger.Instance.offlineVRRig.playerText1.font;
-            code_text.GetComponent<TextMeshPro>().font = GorillaTagger.Instance.offlineVRRig.playerText1.font;
-            playtime_text.GetComponent<TextMeshPro>().font = GorillaTagger.Instance.offlineVRRig.playerText1.font;
-            date_text.GetComponent<TextMeshPro>().font = GorillaTagger.Instance.offlineVRRig.playerText1.font;
-
-            steps_text.GetComponent<TextMeshPro>().outlineColor = GorillaTagger.Instance.offlineVRRig.playerText2.outlineColor;
-            time_text.GetComponent<TextMeshPro>().outlineColor = GorillaTagger.Instance.offlineVRRig.playerText2.outlineColor;
-            code_text.GetComponent<TextMeshPro>().outlineColor = GorillaTagger.Instance.offlineVRRig.playerText2.outlineColor;
-            date_text.GetComponent<TextMeshPro>().outlineColor = GorillaTagger.Instance.offlineVRRig.playerText2.outlineColor;
-            playtime_text.GetComponent<TextMeshPro>().outlineColor = GorillaTagger.Instance.offlineVRRig.playerText2.outlineColor;
-            code_text.GetComponent<TextMeshPro>().outlineColor = GorillaTagger.Instance.offlineVRRig.playerText2.outlineColor;
-
-            steps_text.GetComponent<TextMeshPro>().outlineWidth = GorillaTagger.Instance.offlineVRRig.playerText2.outlineWidth;
-            time_text.GetComponent<TextMeshPro>().outlineWidth = GorillaTagger.Instance.offlineVRRig.playerText2.outlineWidth;
-            code_text.GetComponent<TextMeshPro>().outlineWidth = GorillaTagger.Instance.offlineVRRig.playerText2.outlineWidth;
-            date_text.GetComponent<TextMeshPro>().outlineWidth = GorillaTagger.Instance.offlineVRRig.playerText2.outlineWidth;
-            playtime_text.GetComponent<TextMeshPro>().outlineWidth = GorillaTagger.Instance.offlineVRRig.playerText2.outlineWidth;
-            code_text.GetComponent<TextMeshPro>().outlineWidth = GorillaTagger.Instance.offlineVRRig.playerText2.outlineWidth;
-
+            steps_text.font = GorillaTagger.Instance.offlineVRRig.playerText1.font;
+            time_text.font = GorillaTagger.Instance.offlineVRRig.playerText1.font;
+            code_text.font = GorillaTagger.Instance.offlineVRRig.playerText1.font;
+            playtime_text.font = GorillaTagger.Instance.offlineVRRig.playerText1.font;
+            date_text.font = GorillaTagger.Instance.offlineVRRig.playerText1.font;
 
             //set text
-            steps_text.GetComponent<TextMeshPro>().text = playerData.steps.ToString();
+            steps_text.text = playerData.steps.ToString();
 
             stats.SetActive(false);
-            steps_text.SetActive(true);
+            steps_text.gameObject.SetActive(true);
 
             StartCoroutine("Playtime");
         }
@@ -113,22 +92,24 @@ namespace GorillaSteps
             if (!toggle)
             {
                 stats.SetActive(true);
-                steps_text.SetActive(false);
+                steps_text.gameObject.SetActive(false);
             }
             else
             {
                 stats.SetActive(false);
-                steps_text.SetActive(true);
+                steps_text.gameObject.SetActive(true);
             }
         }
 
         public void OnDisable()
         {
+            HarmonyPatches.RemoveHarmonyPatches();
             if (init) { asset.SetActive(false); }
         }
 
         public void OnEnable()
         {
+            HarmonyPatches.ApplyHarmonyPatches();
             if (init) { asset.SetActive(true); }
         }
 
@@ -140,32 +121,22 @@ namespace GorillaSteps
 
         void Update()
         {
-            if (init)
-            {
-                right_btn = ControllerInputPoller.instance.rightControllerSecondaryButton;
-                //set stats
-                time = DateTime.Now.ToString("t");
-                date = DateTime.Now.ToString("d");
-                code = PhotonNetwork.CurrentRoom != null ? PhotonNetwork.CurrentRoom.Name : "NONE";
-                //change stats text
-                time_text.GetComponent<TextMeshPro>().text = time;
-                date_text.GetComponent<TextMeshPro>().text = date;
-                code_text.GetComponent<TextMeshPro>().text = code;
-                playtime_text.GetComponent<TextMeshPro>().text = playtime_string;
+            if (!init) return;
 
-                if (right_btn)
+            right_btn = ControllerInputPoller.instance.rightControllerSecondaryButton;
+
+            if (right_btn)
+            {
+                if (can_load)
                 {
-                    if (can_load)
-                    {
-                        LoadStats(load);
-                        load = !load;
-                        can_load = false;
-                    }
+                    LoadStats(load);
+                    load = !load;
+                    can_load = false;
                 }
-                else
-                {
-                    can_load = true;
-                }
+            }
+            else
+            {
+                can_load = true;
             }
         }
 
@@ -180,6 +151,29 @@ namespace GorillaSteps
                 hours = playtime / 3600 % 24;
                 days = playtime / 86400 % 365;
                 playtime_string = $"{days}d:{hours}h:{minutes}m:{seconds}s";
+                playtime_text.text = playtime_string;
+
+                time = DateTime.Now.ToString("t");
+                date = DateTime.Now.ToString("d");
+                code = PhotonNetwork.CurrentRoom != null ? PhotonNetwork.CurrentRoom.Name : "NONE";
+
+                if (time != last_time)
+                {
+                    time_text.text = time;
+                    last_time = time;
+                }
+
+                if (date != last_date)
+                {
+                    date_text.text = date;
+                    last_date = date;
+                }
+
+                if (code != last_code)
+                {
+                    code_text.text = code;
+                    last_code = code;
+                }
             }
         }
     }

@@ -9,7 +9,7 @@ namespace GorillaSteps
         private static Harmony instance;
 
         public static bool IsPatched { get; private set; }
-        public const string InstanceId = "bjrsinge.gorillasteps";
+        public const string InstanceId = "com.bjrsinge.gorillatag.gorillasteps";
 
         internal static void ApplyHarmonyPatches()
         {

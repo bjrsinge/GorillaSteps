@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="C:\Users\bjr\.nuget\packages\bepinex.assemblypublicizer.msbuild\0.4.3\contentFiles\cs\any\IgnoresAccessChecksToAttribute.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="newestwatch" />
     <None Remove="updatedwatch" />
   </ItemGroup>
